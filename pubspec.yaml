@@ -1,0 +1,43 @@
+name: flux_player
+description: "Flux Media Player"
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.14.4
+  path_provider: ^2.1.6
+  provider: ^6.1.5+1
+  file_picker: ^12.2.0
+
+  window_manager: ^0.5.2
+  # just_audio: ^0.10.6
+  # just_audio_background: ^0.0.1-beta.17
+  media_kit: ^1.2.6
+  media_kit_libs_audio: ^1.0.7
+  audio_service: ^0.18.19
+  audio_service_win: ^0.0.3
+  audio_session: ^0.2.4
+  audio_metadata_reader: ^1.7.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+
+flutter_launcher_icons:
+  image_path: assets/logo.png
+  windows:
+    generate: true
