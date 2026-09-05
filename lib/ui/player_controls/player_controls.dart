@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_context_menu/flutter_context_menu.dart';
 
 import '../../core/services/audio_player.dart';
 import '../../core/theme/styles.dart';
 import '../../core/theme/values.dart';
+import '../../core/utils/global_paint_bounds.dart';
 import '../track/track_icon.dart';
 import 'widgets/position_slider.dart';
+import 'widgets/volume_button.dart';
 
 class PlayerControls extends StatefulWidget {
   const PlayerControls({super.key});
@@ -26,9 +29,10 @@ class _PlayerControlsState extends State<PlayerControls>
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.isPlaying.listen(
-      (_) => playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0),
-    );
+    subscription = audioPlayer.stream.isPlaying.listen((_) {
+      playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0);
+      setState(() {});
+    });
   }
 
   @override
@@ -36,6 +40,24 @@ class _PlayerControlsState extends State<PlayerControls>
     super.dispose();
     playAnim.dispose();
     subscription.cancel();
+  }
+
+  Future<void> showDeviceContextMenu(BuildContext context) async {
+    final menu = ContextMenu(
+      position: context.findRenderObject()!.globalPaintBounds.center,
+      padding: .zero,
+      entries: audioPlayer.audioDevices
+          .map(
+            (e) => MenuItem(
+              label: Text(e.description, style: const .new(fontSize: 12)),
+              value: e,
+              enabled: audioPlayer.audioDevice != e,
+            ),
+          )
+          .toList(),
+    );
+    final device = await menu.show(context);
+    if (device != null) await audioPlayer.setAudioDevice(device);
   }
 
   @override
@@ -124,6 +146,16 @@ class _PlayerControlsState extends State<PlayerControls>
       ),
     ];
 
+    final sideButtons = [
+      Builder(
+        builder: (context) => IconButton(
+          onPressed: () => showDeviceContextMenu(context),
+          icon: const Icon(Icons.input_rounded),
+        ),
+      ),
+      const VolumeButton(),
+    ];
+
     return Card(
       clipBehavior: .hardEdge,
       shape: RoundedRectangleBorder(
@@ -143,12 +175,7 @@ class _PlayerControlsState extends State<PlayerControls>
                 Expanded(child: trackInfo),
                 Row(mainAxisAlignment: .center, children: controlButtons),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: .end,
-                    children: [
-                      TextButton(onPressed: () {}, child: const Text('test')),
-                    ],
-                  ),
+                  child: Row(mainAxisAlignment: .end, children: sideButtons),
                 ),
               ],
             ),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/audio_player.dart';
 import '../search_field.dart';
 import '../track/track_item.dart';
-import '../track/track_list_view.dart';
+import '../track/track_list_view_builder.dart';
 
 class QueuePage extends StatefulWidget {
   const QueuePage({super.key});
@@ -14,8 +14,12 @@ class QueuePage extends StatefulWidget {
   State<QueuePage> createState() => _QueuePageState();
 }
 
-class _QueuePageState extends State<QueuePage> {
+class _QueuePageState extends State<QueuePage>
+    with AutomaticKeepAliveClientMixin<QueuePage> {
   late final StreamSubscription subscription;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -31,13 +35,14 @@ class _QueuePageState extends State<QueuePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final tracks = audioPlayer.queue;
 
     return Column(
       children: [
         const SearchField(hint: 'Поиск треков'),
         Expanded(
-          child: TrackListView(
+          child: TrackListViewBuilder(
             trackCount: tracks.length,
             trackBuilder: (context, idx) => StreamBuilder(
               stream: audioPlayer.stream.currentTrack,
@@ -51,7 +56,15 @@ class _QueuePageState extends State<QueuePage> {
                       audioPlayer.isPlaying,
                   onPlayPressed: () =>
                       audioPlayer.setQueue(tracks, index: idx, play: true),
-                  actionButtons: const [TrackNextAction()],
+                  actionButtons: [
+                    if (tracks[idx].isRemote) const TrackDownloadAction(),
+                    const TrackNextAction(),
+                    TrackActionButton(
+                      icon: Icons.close_rounded,
+                      iconSize: 20,
+                      onPressed: () => audioPlayer.removeFromQueue(idx),
+                    ),
+                  ],
                 ),
               ),
             ),

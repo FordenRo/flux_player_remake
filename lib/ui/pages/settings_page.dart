@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/repositories/library_repository.dart';
+import '../../core/services/network_service.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -9,20 +10,47 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
     children: const [
-      _LibraryPathsWidget(),
-      ListTile(title: Text('Version: 0.1.0')),
+      _LibraryPathsTile(),
+      // ListTile(
+      //   title: Text('Путь загрузок'),
+      //   leading: Icon(Icons.download_rounded),
+      //   trailing: Row(mainAxisSize: .min, children: [Text('Нет')]),
+      // ),
+      _DownloadPathTile(),
+      ListTile(title: Text('Версия'), subtitle: Text('0.1.0')),
     ],
   );
 }
 
-class _LibraryPathsWidget extends StatefulWidget {
+class _DownloadPathTile extends StatefulWidget {
   const new();
 
   @override
-  State<_LibraryPathsWidget> createState() => _LibraryPathsWidgetState();
+  State<_DownloadPathTile> createState() => _DownloadPathTileState();
 }
 
-class _LibraryPathsWidgetState extends State<_LibraryPathsWidget> {
+class _DownloadPathTileState extends State<_DownloadPathTile> {
+  Future<void> edit() async {
+    final path = await FilePicker.getDirectoryPath();
+    setState(() => networkService.downloadPath = path);
+  }
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    title: const Text('Путь загрузок'),
+    subtitle: Text(networkService.downloadPath ?? 'Нет'),
+    trailing: IconButton(onPressed: edit, icon: const Icon(Icons.edit_rounded)),
+  );
+}
+
+class _LibraryPathsTile extends StatefulWidget {
+  const new();
+
+  @override
+  State<_LibraryPathsTile> createState() => _LibraryPathsTileState();
+}
+
+class _LibraryPathsTileState extends State<_LibraryPathsTile> {
   Future<void> add() async {
     final path = await FilePicker.getDirectoryPath();
     if (path == null) return;
@@ -39,7 +67,7 @@ class _LibraryPathsWidgetState extends State<_LibraryPathsWidget> {
     child: Column(
       children: [
         ListTile(
-          title: const Text('Library paths:'),
+          title: const Text('Пути библиотеки'),
           trailing: IconButton(
             onPressed: add,
             icon: const Icon(Icons.add_rounded),

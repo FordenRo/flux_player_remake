@@ -12,37 +12,45 @@ final libraryRepository = LibraryRepository._();
 class LibraryRepository {
   LibraryRepository._();
 
-  List<Track>? _tracks;
+  List<Track>? _cachedTracks;
+  List<Track>? _allTracks;
   var _paths = <String>{'C:/Users/FordenRo/Music'};
 
-  List<Track> getAllTracks() => _tracks ??= _paths
+  List<Track> getAllTracks() => _allTracks ??= _paths
       .map(
         (e) =>
             Directory(e)
                 .listSync()
                 .whereType<File>()
                 .where((e) => audioExtensions.contains(e.path.split('.').last))
-                .map(loadTrackFromFile),
+                .map(getTrackFromFile),
       )
       .fold(<Track>[], (a, b) => a.followedBy(b).toList())
       .toList();
 
   List<String> getPaths() => _paths.toList();
 
+  Track getTrackFromFile(File file) =>
+      _cachedTracks?.firstWhere(
+        (e) => e.path == file.path,
+        orElse: () => _loadTrack(file),
+      ) ??
+      _loadTrack(file);
+
   void setPaths(Iterable<String> paths) => _paths = paths.toSet();
 
   void addPath(String path) {
     _paths.add(path);
-    _tracks = null;
+    _allTracks = null;
   }
 
   void removePath(String path) {
     _paths.remove(path);
-    _tracks = null;
+    _allTracks = null;
   }
 }
 
-Track loadTrackFromFile(File file) {
+Track _loadTrack(File file) {
   final metadata = readMetadata(file);
   return .new(
     title: metadata.title!,

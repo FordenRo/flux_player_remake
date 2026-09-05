@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/models/track.dart';
 import '../../core/services/audio_player.dart';
+import '../../core/services/network_service.dart';
 import '../../core/theme/styles.dart';
 import '../../core/theme/values.dart';
 import 'play_button.dart';
@@ -102,7 +103,10 @@ class TrackActionButton extends StatelessWidget {
     onPressed: onPressed,
     icon: Icon(icon, size: iconSize),
     color: Theme.of(context).colorScheme.onSurfaceVariant,
-    style: .new(minimumSize: .all(.zero), padding: .all(const .all(4))),
+    style: .new(
+      minimumSize: .all(const .fromRadius(16)),
+      padding: .all(const .all(4)),
+    ),
   );
 }
 
@@ -117,5 +121,20 @@ class TrackNextAction extends StatelessWidget {
     iconSize: iconSize,
     onPressed: () =>
         audioPlayer.addNext(Provider.of<Track>(context, listen: false)),
+  );
+}
+
+class TrackDownloadAction extends StatelessWidget {
+  const new({this.iconSize = 16, super.key});
+
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) => TrackActionButton(
+    icon: Icons.download_rounded,
+    iconSize: iconSize,
+    onPressed: () => networkService.downloadTrack(
+      Provider.of<Track>(context, listen: false),
+    ),
   );
 }

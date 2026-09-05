@@ -34,6 +34,8 @@ class AudioPlayer {
   bool get isShuffled => _isShuffled;
   bool get isLooped => _isLooped;
   List<Track> get queue => _queue;
+  List<AudioDevice> get audioDevices => _player.state.audioDevices;
+  AudioDevice get audioDevice => _player.state.audioDevice;
   int? get currentIndex => _currentIndex;
   Track? get currentTrack => currentIndex != null ? queue[currentIndex!] : null;
   Playlist? get currentPlaylist => _currentPlaylist;
@@ -47,7 +49,7 @@ class AudioPlayer {
   late final AudioPlayerStream stream = .new(
     volume: _player.stream.volume.map((e) => e / 100),
     currentIndex: _currentIndexController.stream.distinct(),
-    queue: _queueController.stream.distinct(),
+    queue: _queueController.stream,
     position: _player.stream.position,
     duration: _player.stream.duration,
     isPlaying: _player.stream.playing,
@@ -58,6 +60,7 @@ class AudioPlayer {
     isLooped: _isLoopedController.stream.distinct(),
     currentPlaylist: _currentPlaylistController.stream.distinct(),
     buffer: _player.stream.buffer,
+    audioDevice: _player.stream.audioDevice,
   );
 
   Future<void> setVolume(double volume) =>
@@ -126,28 +129,38 @@ class AudioPlayer {
     if (index != null) await setIndex(index, play: play, load: load);
   }
 
-  void addToQueue(Track track) {
+  Future<void> removeFromQueue(int index) async {
+    _queue.removeAt(index);
+    _queueController.add(_queue);
+    if (currentIndex == index) {
+      await setIndex(index, play: isPlaying);
+    } else if (index < audioPlayer.currentIndex!) {
+      await setIndex(audioPlayer.currentIndex! - 1, load: false);
+    }
+  }
+
+  Future<void> addToQueue(Track track) async {
     _queue.add(track);
-    _queueController.add(queue);
-    if (currentIndex == null) setIndex(0, play: false);
+    _queueController.add(_queue);
+    if (currentIndex == null) await setIndex(0, play: false);
   }
 
-  void addAllToQueue(Iterable<Track> tracks) {
+  Future<void> addAllToQueue(Iterable<Track> tracks) async {
     _queue.addAll(tracks);
-    _queueController.add(queue);
-    if (currentIndex == null) setIndex(0, play: false);
+    _queueController.add(_queue);
+    if (currentIndex == null) await setIndex(0, play: false);
   }
 
-  void addNext(Track track) {
+  Future<void> addNext(Track track) async {
     _queue.insert((currentIndex ?? -1) + 1, track);
-    _queueController.add(queue);
-    if (currentIndex == null) setIndex(0, play: false);
+    _queueController.add(_queue);
+    if (currentIndex == null) await setIndex(0, play: false);
   }
 
-  void addAllToNext(Iterable<Track> tracks) {
+  Future<void> addAllToNext(Iterable<Track> tracks) async {
     _queue.insertAll((currentIndex ?? -1) + 1, tracks);
-    _queueController.add(queue);
-    if (currentIndex == null) setIndex(0, play: false);
+    _queueController.add(_queue);
+    if (currentIndex == null) await setIndex(0, play: false);
   }
 
   Future<void> setAudioDevice(AudioDevice device) =>
@@ -215,6 +228,7 @@ class AudioPlayerStream {
     required this.isLooped,
     required this.currentPlaylist,
     required this.buffer,
+    required this.audioDevice,
   });
 
   final Stream<double> volume;
@@ -228,4 +242,5 @@ class AudioPlayerStream {
   final Stream<bool> isLooped;
   final Stream<Playlist?> currentPlaylist;
   final Stream<Duration> buffer;
+  final Stream<AudioDevice> audioDevice;
 }

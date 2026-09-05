@@ -1,33 +1,64 @@
 import 'package:flutter/material.dart';
 
-class TrackListView extends StatelessWidget {
-  const TrackListView({
-    required this.trackCount,
-    required this.trackBuilder,
+import '../../core/models/track.dart';
+import '../../core/services/audio_player.dart';
+import 'track_item.dart';
+import 'track_list_view_builder.dart';
+
+class TrackListView extends StatefulWidget {
+  const new({
+    required this.tracks,
     this.onTrackMoved,
+    this.onTrackPlayed,
+    this.trackActionButtons,
+    this.showNext = true,
+    this.showDownload = true,
     super.key,
   });
 
-  final int trackCount;
+  final List<Track> tracks;
   final void Function(int oldIndex, int newIndex)? onTrackMoved;
-  final Widget Function(BuildContext context, int index) trackBuilder;
+  final void Function(Track track)? onTrackPlayed;
+  final bool showNext;
+  final bool showDownload;
+  final List<Widget>? trackActionButtons;
 
   @override
-  Widget build(BuildContext context) => onTrackMoved == null
-      ? ListView.builder(
-          itemExtent: 50,
-          itemCount: trackCount,
-          itemBuilder: trackBuilder,
-        )
-      : ReorderableListView.builder(
-          itemCount: trackCount,
-          itemExtent: 50,
-          buildDefaultDragHandles: false,
-          onReorderItem: onTrackMoved,
-          itemBuilder: (context, idx) => ReorderableDragStartListener(
-            key: Key(idx.toString()),
-            index: idx,
-            child: trackBuilder(context, idx),
-          ),
-        );
+  State<TrackListView> createState() => _TrackListViewState();
+}
+
+class _TrackListViewState extends State<TrackListView> {
+  @override
+  Widget build(BuildContext context) => TrackListViewBuilder(
+    trackCount: widget.tracks.length,
+    trackBuilder: (context, index) {
+      final track = widget.tracks[index];
+      return StreamBuilder(
+        stream: audioPlayer.stream.currentTrack,
+        builder: (context, asyncSnapshot) => audioPlayer.currentTrack == track
+            ? StreamBuilder(
+                stream: audioPlayer.stream.isPlaying,
+                builder: (context, asyncSnapshot) => _buildTrack(track),
+              )
+            : _buildTrack(track),
+      );
+    },
+    onTrackMoved: widget.onTrackMoved,
+  );
+
+  TrackItem _buildTrack(Track track) => TrackItem(
+    track,
+    isSelected: audioPlayer.currentTrack == track,
+    isPlaying: audioPlayer.currentTrack == track && audioPlayer.isPlaying,
+    onPlayPressed: widget.onTrackPlayed != null
+        ? () => audioPlayer.currentTrack == track && audioPlayer.isPlaying
+              ? audioPlayer.pause()
+              : widget.onTrackPlayed!(track)
+        : null,
+    actionButtons: [
+      ...?widget.trackActionButtons,
+      if (widget.showDownload && track.isRemote) const TrackDownloadAction(),
+      if (widget.showNext) const TrackNextAction(),
+    ],
+  );
 }

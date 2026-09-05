@@ -5,7 +5,7 @@ import '../../core/repositories/library_repository.dart';
 import '../../core/services/audio_player.dart';
 import '../search_field.dart';
 import '../track/track_item.dart';
-import '../track/track_list_view.dart';
+import '../track/track_list_view_builder.dart';
 
 class AllTracksPage extends StatelessWidget {
   const AllTracksPage({super.key});
@@ -22,7 +22,7 @@ class AllTracksPage extends StatelessWidget {
       children: [
         const SearchField(hint: 'Поиск треков'),
         Expanded(
-          child: TrackListView(
+          child: TrackListViewBuilder(
             trackCount: tracks.length,
             trackBuilder: (context, idx) => StreamBuilder(
               stream: audioPlayer.stream.currentTrack,

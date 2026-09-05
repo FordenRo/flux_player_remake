@@ -8,6 +8,7 @@ class Track {
     required this.duration,
     this.album,
     this.picture,
+    this.isLocal = true,
   });
 
   final String path;
@@ -16,4 +17,7 @@ class Track {
   final String? album;
   final Duration duration;
   final Uint8List? picture;
+  final bool isLocal;
+
+  bool get isRemote => !isLocal;
 }
