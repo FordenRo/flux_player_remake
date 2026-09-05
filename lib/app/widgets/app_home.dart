@@ -22,12 +22,13 @@ class AppHome extends StatefulWidget {
 class _AppHomeState extends State<AppHome> {
   late final StreamSubscription subscription;
 
-  final pages = {
-    0: const AllTracksPage(),
-    1: const QueuePage(),
-    3: const NetworkPage(),
-    4: const SettingsPage(),
-  };
+  final pages = [
+    const AllTracksPage(),
+    const QueuePage(),
+    const SizedBox(),
+    const NetworkPage(),
+    const SettingsPage(),
+  ];
 
   int get page => configRepository.page;
   set page(int value) => configRepository.page = value;
@@ -98,7 +99,13 @@ class _AppHomeState extends State<AppHome> {
               ],
             ),
           ),
-          if (audioPlayer.currentIndex != null) const PlayerControls(),
+          StreamBuilder(
+            stream: audioPlayer.stream.currentIndex.map((e) => e != null),
+            initialData: audioPlayer.currentIndex != null,
+            builder: (context, asyncSnapshot) => asyncSnapshot.requireData
+                ? const PlayerControls()
+                : const SizedBox(),
+          ),
         ],
       ),
     );
