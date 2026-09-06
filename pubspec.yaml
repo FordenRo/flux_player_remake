@@ -16,6 +16,7 @@ dependencies:
   path_provider: ^2.1.6
   provider: ^6.1.5+1
   file_picker: ^12.2.0
+  fuzzy: ^0.5.1
 
   window_manager: ^0.5.2
   flutter_context_menu: ^0.4.2

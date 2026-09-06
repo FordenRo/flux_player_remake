@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../core/repositories/config_repository.dart';
-import '../../core/services/audio_player.dart';
-import '../../core/theme/values.dart';
-import '../../ui/pages/all_tracks_page.dart';
-import '../../ui/pages/network_page.dart';
-import '../../ui/pages/queue_page.dart';
-import '../../ui/pages/settings_page.dart';
-import '../../ui/player_controls/player_controls.dart';
-import 'caption_widget.dart';
+import '../core/repositories/config_repository.dart';
+import '../core/services/audio_player.dart';
+import '../core/theme/values.dart';
+import '../ui/pages/all_tracks_page.dart';
+import '../ui/pages/network_page.dart';
+import '../ui/pages/playlists_page.dart';
+import '../ui/pages/queue_page.dart';
+import '../ui/pages/settings_page.dart';
+import '../ui/player_controls/player_controls.dart';
+import 'widgets/app_logo.dart';
+import 'widgets/app_tab_button.dart';
+import 'widgets/caption_widget.dart';
 
 class AppHome extends StatefulWidget {
   const new({super.key});
@@ -25,7 +28,7 @@ class _AppHomeState extends State<AppHome> {
   final pages = [
     const AllTracksPage(),
     const QueuePage(),
-    const SizedBox(),
+    const PlaylistsPage(),
     const NetworkPage(),
     const SettingsPage(),
   ];
@@ -48,7 +51,7 @@ class _AppHomeState extends State<AppHome> {
   @override
   Widget build(BuildContext context) {
     final sideBarChildren = [
-      const _Logo(),
+      const AppLogo(),
       const SizedBox(height: 16),
       _buildTabButton('Все треки', Icons.search_rounded, 0),
       _buildTabButton('Очередь', Icons.music_note_rounded, 1),
@@ -111,74 +114,11 @@ class _AppHomeState extends State<AppHome> {
     );
   }
 
-  _TabButton _buildTabButton(String title, IconData icon, int page) =>
-      _TabButton(
+  AppTabButton _buildTabButton(String title, IconData icon, int page) =>
+      AppTabButton(
         icon: icon,
         title: title,
         isSelected: this.page == page,
         onSelected: () => this.page = page,
       );
-}
-
-class _Logo extends StatelessWidget {
-  const new();
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const .symmetric(vertical: 8),
-    child: StreamBuilder(
-      stream: audioPlayer.stream.isPlaying,
-      builder: (context, asyncSnapshot) => Image.asset(
-        'assets/logo.png',
-        width: 32,
-        color: audioPlayer.isPlaying
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSurface,
-      ),
-    ),
-  );
-}
-
-class _TabButton extends StatelessWidget {
-  const new({
-    required this.icon,
-    required this.title,
-    required this.isSelected,
-    required this.onSelected,
-  });
-
-  final IconData icon;
-  final String title;
-  final void Function() onSelected;
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) => TooltipTheme(
-    data: .new(
-      waitDuration: Durations.medium1,
-      decoration: ShapeDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        shape: const RoundedRectangleBorder(borderRadius: .all(.circular(8))),
-      ),
-      textStyle: .new(
-        color: Theme.of(context).colorScheme.onSecondaryContainer,
-      ),
-    ),
-    child: IconButton(
-      tooltip: title,
-      padding: const .symmetric(horizontal: 24, vertical: 10),
-      onPressed: onSelected,
-      isSelected: isSelected,
-      style: .new(
-        splashFactory: NoSplash.splashFactory,
-        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-        foregroundColor: .fromMap({
-          WidgetState.hovered: !isSelected
-              ? Theme.of(context).colorScheme.onSurface
-              : null,
-        }),
-      ),
-      icon: Icon(icon),
-    ),
-  );
 }

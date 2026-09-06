@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/services/audio_player.dart';
-import '../search_field.dart';
-import '../track/track_item.dart';
-import '../track/track_list_view_builder.dart';
+import '../../core/utils/track_search.dart';
+import '../widgets/search_field.dart';
+import '../widgets/track_item.dart';
+import '../widgets/track_list_view_builder.dart';
 
 class QueuePage extends StatefulWidget {
   const QueuePage({super.key});
@@ -38,39 +39,30 @@ class _QueuePageState extends State<QueuePage>
     super.build(context);
     final tracks = audioPlayer.queue;
 
-    return Column(
-      children: [
-        const SearchField(hint: 'Поиск треков'),
-        Expanded(
-          child: TrackListViewBuilder(
-            trackCount: tracks.length,
-            trackBuilder: (context, idx) => StreamBuilder(
-              stream: audioPlayer.stream.currentTrack,
-              builder: (context, asyncSnapshot) => StreamBuilder(
-                stream: audioPlayer.stream.isPlaying,
-                builder: (context, asyncSnapshot) => TrackItem(
-                  tracks[idx],
-                  isSelected: audioPlayer.currentTrack == tracks[idx],
-                  isPlaying:
-                      audioPlayer.currentTrack == tracks[idx] &&
-                      audioPlayer.isPlaying,
-                  onPlayPressed: () =>
-                      audioPlayer.setQueue(tracks, index: idx, play: true),
-                  actionButtons: [
-                    if (tracks[idx].isRemote) const TrackDownloadAction(),
-                    const TrackNextAction(),
-                    TrackActionButton(
-                      icon: Icons.close_rounded,
-                      iconSize: 20,
-                      onPressed: () => audioPlayer.removeFromQueue(idx),
-                    ),
-                  ],
-                ),
+    return TrackListViewBuilder(
+      trackCount: tracks.length,
+      trackBuilder: (context, idx) => StreamBuilder(
+        stream: audioPlayer.stream.currentTrack,
+        builder: (context, asyncSnapshot) => StreamBuilder(
+          stream: audioPlayer.stream.isPlaying,
+          builder: (context, asyncSnapshot) => TrackItem(
+            tracks[idx],
+            isSelected: audioPlayer.currentIndex == idx,
+            isPlaying: audioPlayer.currentIndex == idx && audioPlayer.isPlaying,
+            onPlayPressed: () =>
+                audioPlayer.setQueue(tracks, index: idx, play: true),
+            actionButtons: [
+              if (tracks[idx].isRemote) const TrackDownloadAction(),
+              const TrackNextAction(),
+              TrackActionButton(
+                icon: Icons.close_rounded,
+                iconSize: 20,
+                onPressed: () => audioPlayer.removeFromQueue(idx),
               ),
-            ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

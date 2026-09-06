@@ -4,7 +4,7 @@ import '../core/repositories/config_repository.dart';
 import '../core/services/config_service.dart';
 import '../core/theme/theme.dart';
 
-import 'widgets/app_home.dart';
+import 'app_home.dart';
 import 'widgets/loading_screen.dart';
 
 enum AppPage { allTracks, playlists, netSearch, settings }

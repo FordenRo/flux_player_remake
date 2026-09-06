@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../core/models/track.dart';
 import '../../core/services/audio_player.dart';
 import '../../core/services/network_service.dart';
-import '../search_field.dart';
-import '../track/track_item.dart';
-import '../track/track_list_view_builder.dart';
+import '../widgets/search_field.dart';
+import '../widgets/track_item.dart';
+import '../widgets/track_list_view_builder.dart';
 
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});

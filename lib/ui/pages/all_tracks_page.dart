@@ -3,12 +3,20 @@ import 'package:flutter/material.dart';
 import '../../core/models/track.dart';
 import '../../core/repositories/library_repository.dart';
 import '../../core/services/audio_player.dart';
-import '../search_field.dart';
-import '../track/track_item.dart';
-import '../track/track_list_view_builder.dart';
+import '../../core/utils/track_search.dart';
+import '../widgets/search_field.dart';
+import '../widgets/track_item.dart';
+import '../widgets/track_list_view_builder.dart';
 
-class AllTracksPage extends StatelessWidget {
+class AllTracksPage extends StatefulWidget {
   const AllTracksPage({super.key});
+
+  @override
+  State<AllTracksPage> createState() => _AllTracksPageState();
+}
+
+class _AllTracksPageState extends State<AllTracksPage> {
+  var query = '';
 
   List<Track> get allTracks => libraryRepository.getAllTracks();
   List<Track> get sortedTracks =>
@@ -16,11 +24,16 @@ class AllTracksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = sortedTracks;
+    final tracks = query.isNotEmpty
+        ? searchTracks(allTracks, query)
+        : sortedTracks;
 
     return Column(
       children: [
-        const SearchField(hint: 'Поиск треков'),
+        SearchField(
+          hint: 'Поиск треков',
+          onChanged: (query) => setState(() => this.query = query),
+        ),
         Expanded(
           child: TrackListViewBuilder(
             trackCount: tracks.length,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/values.dart';
+import '../../core/theme/values.dart';
 
 class SearchField extends StatefulWidget {
   const SearchField({this.hint, this.onChanged, this.onSubmitted, super.key});

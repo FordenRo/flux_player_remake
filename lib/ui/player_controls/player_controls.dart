@@ -7,7 +7,7 @@ import '../../core/services/audio_player.dart';
 import '../../core/theme/styles.dart';
 import '../../core/theme/values.dart';
 import '../../core/utils/global_paint_bounds.dart';
-import '../track/track_icon.dart';
+import '../widgets/track_icon.dart';
 import 'widgets/position_slider.dart';
 import 'widgets/volume_button.dart';
 

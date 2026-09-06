@@ -12,21 +12,34 @@ class VolumeButton extends StatefulWidget {
   State<VolumeButton> createState() => _VolumeButtonState();
 }
 
-class _VolumeButtonState extends State<VolumeButton> {
+class _VolumeButtonState extends State<VolumeButton>
+    with SingleTickerProviderStateMixin {
   late final StreamSubscription subscription;
+  late final controller = AnimationController(
+    vsync: this,
+    duration: Durations.medium1,
+  );
+  late final colorAnim = ColorTween(
+    begin: Theme.of(context).colorScheme.primary.withAlpha(100),
+    end: Theme.of(context).colorScheme.primary.withAlpha(200),
+  ).animate(controller);
+  Timer? animTimer;
 
   var lastVolume = audioPlayer.volume;
 
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.volume.listen((_) => setState(() {}));
+    subscription = audioPlayer.stream.volume.listen(
+      (_) => setState(updateAnim),
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
     subscription.cancel();
+    animTimer?.cancel();
   }
 
   void mute() {
@@ -36,6 +49,15 @@ class _VolumeButtonState extends State<VolumeButton> {
     } else {
       audioPlayer.setVolume(lastVolume);
     }
+  }
+
+  void updateAnim() {
+    if (!(animTimer?.isActive ?? false)) controller.animateTo(1);
+    animTimer?.cancel();
+    animTimer = Timer(
+      const Duration(seconds: 1),
+      () => controller.animateBack(0),
+    );
   }
 
   IconData _getIconDataFromVolume(double volume) => switch (volume) {
@@ -57,11 +79,15 @@ class _VolumeButtonState extends State<VolumeButton> {
       children: [
         SizedBox.square(
           dimension: 40,
-          child: CircularProgressIndicator(
-            value: audioPlayer.volume,
-            strokeAlign: -1,
-            strokeWidth: 2.5,
-            strokeCap: .round,
+          child: AnimatedBuilder(
+            animation: controller,
+            builder: (context, child) => CircularProgressIndicator(
+              value: audioPlayer.volume,
+              valueColor: colorAnim,
+              strokeAlign: -1,
+              strokeWidth: 2.5,
+              strokeCap: .round,
+            ),
           ),
         ),
         IconButton(

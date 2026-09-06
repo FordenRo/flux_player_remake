@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/values.dart';
-import '../widgets/fade_in_widget.dart';
+import 'fade_in_widget.dart';
 import 'play_button.dart';
 
 class TrackIcon extends StatelessWidget {
