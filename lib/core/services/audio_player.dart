@@ -20,7 +20,7 @@ class AudioPlayer {
   final _player = media_kit.Player();
 
   List<Track> _queue = [];
-  List<Track>? _originalQueue = [];
+  List<Track>? _originalQueue;
   Playlist? _currentPlaylist;
   int? _currentIndex;
   var _isShuffled = false;
