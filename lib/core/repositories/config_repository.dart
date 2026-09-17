@@ -67,6 +67,23 @@ class ConfigRepository {
     }
   }
 
+  Future<AppConfig> getConfig() async {
+    final Size(width: ww, height: wh) = await windowManager.getSize();
+    final Offset(dx: wx, dy: wy) = await windowManager.getPosition();
+    return .new(
+      page: page,
+      windowPosition: (x: wx.toInt(), y: wy.toInt()),
+      windowSize: (x: ww.toInt(), y: wh.toInt()),
+      libraryPaths: libraryRepository.getPaths(),
+      device: audioPlayer.audioDevice.name,
+      volume: audioPlayer.volume,
+      shuffled: audioPlayer.isShuffled,
+      looped: audioPlayer.isLooped,
+      queue: audioPlayer.queue.map((e) => e.path).toList(),
+      position: audioPlayer.position.inSeconds,
+    );
+  }
+
   Future<void> dispose() => Future.wait([_pageController.close()]);
 }
 
