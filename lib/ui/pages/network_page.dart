@@ -4,8 +4,7 @@ import '../../core/models/track.dart';
 import '../../core/services/audio_player.dart';
 import '../../core/services/network_service.dart';
 import '../widgets/search_field.dart';
-import '../widgets/track_item.dart';
-import '../widgets/track_list_view_builder.dart';
+import '../widgets/track_list_view.dart';
 
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});
@@ -33,25 +32,12 @@ class _NetworkPageState extends State<NetworkPage> {
         future: networkService.queryTracks(query),
         builder: (context, asyncSnapshot) => asyncSnapshot.hasData
             ? Expanded(
-                child: TrackListViewBuilder(
-                  trackCount: asyncSnapshot.requireData.length,
-                  trackBuilder: (context, idx) => TrackItem(
-                    asyncSnapshot.requireData[idx],
-                    actionButtons: const [
-                      // TrackActionButton(
-                      //   icon: Icons.download_rounded,
-                      //   iconSize: 16,
-                      //   onPressed: () =>
-                      //       download(asyncSnapshot.requireData[idx]),
-                      // ),
-                      TrackDownloadAction(),
-                      TrackNextAction(),
-                    ],
-                    onPlayPressed: () => audioPlayer.setQueue(
-                      asyncSnapshot.requireData,
-                      index: idx,
-                      play: true,
-                    ),
+                child: TrackListView(
+                  tracks: asyncSnapshot.requireData,
+                  onTrackPlayed: (index) => audioPlayer.setQueue(
+                    asyncSnapshot.requireData,
+                    index: index,
+                    play: true,
                   ),
                 ),
               )

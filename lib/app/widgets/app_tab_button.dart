@@ -6,6 +6,7 @@ class AppTabButton extends StatelessWidget {
     required this.title,
     required this.isSelected,
     required this.onSelected,
+    super.key,
   });
 
   final IconData icon;

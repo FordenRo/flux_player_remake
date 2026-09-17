@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flux_player/core/services/audio_player.dart';
+
+import '../../core/services/audio_player.dart';
 
 class AppLogo extends StatefulWidget {
   const new({super.key});

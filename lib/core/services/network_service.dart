@@ -36,10 +36,10 @@ class NetworkService {
         final path = e
             .getElementsByClassName('track__download-btn')
             .first
-            .attributes['href']!;
+            .attributes['href'];
 
         return Track(
-          path: Uri.https('ru.hitmoz.org', path).toString(),
+          path: Uri.https('ru.hitmoz.org', path!).toString(),
           title: meta['title'] as String,
           artist: meta['artist'] as String,
           duration: duration,
