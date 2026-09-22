@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_context_menu/flutter_context_menu.dart';
 
 import '../../core/models/track.dart';
 import '../../core/services/audio_player.dart';
@@ -10,9 +10,10 @@ class TrackListView extends StatefulWidget {
     required this.tracks,
     this.onTrackMoved,
     this.onTrackPlayed,
-    this.trackActionButtons,
     this.showNext = true,
     this.showDownload = true,
+    this.menuEntriesBuilder,
+    this.trackActionButtonsBuilder,
     super.key,
   });
 
@@ -21,7 +22,14 @@ class TrackListView extends StatefulWidget {
   final void Function(int index)? onTrackPlayed;
   final bool showNext;
   final bool showDownload;
-  final List<Widget>? trackActionButtons;
+  final List<ContextMenuEntry<void>> Function(BuildContext context, int index)?
+  menuEntriesBuilder;
+  final List<Widget> Function(
+    BuildContext context,
+    int index,
+    List<Widget> children,
+  )?
+  trackActionButtonsBuilder;
 
   @override
   State<TrackListView> createState() => _TrackListViewState();
@@ -60,6 +68,10 @@ class _TrackListViewState extends State<TrackListView> {
 
   TrackItem _buildTrack(int index) {
     final track = widget.tracks[index];
+    final actionButtons = [
+      if (widget.showDownload && track.isRemote) const TrackDownloadAction(),
+      if (widget.showNext) const TrackNextAction(),
+    ];
     return TrackItem(
       track,
       isSelected: audioPlayer.currentTrack == track,
@@ -69,13 +81,12 @@ class _TrackListViewState extends State<TrackListView> {
                 ? audioPlayer.pause()
                 : widget.onTrackPlayed!(index)
           : null,
-      actionButtons: [
-        ...?widget.trackActionButtons?.map(
-          (e) => Provider.value(value: index, child: e),
-        ),
-        if (widget.showDownload && track.isRemote) const TrackDownloadAction(),
-        if (widget.showNext) const TrackNextAction(),
-      ],
+      menuEntriesBuilder: widget.menuEntriesBuilder != null
+          ? () => widget.menuEntriesBuilder!(context, index)
+          : null,
+      actionButtons: widget.trackActionButtonsBuilder == null
+          ? actionButtons
+          : widget.trackActionButtonsBuilder!(context, index, actionButtons),
     );
   }
 }

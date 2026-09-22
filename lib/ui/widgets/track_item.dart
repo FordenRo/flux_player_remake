@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_context_menu/flutter_context_menu.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/models/track.dart';
@@ -14,13 +15,17 @@ class TrackItem extends StatelessWidget {
     this.track, {
     this.onPlayPressed,
     this.actionButtons,
+    this.menuEntries,
     this.isPlaying = false,
     this.isSelected = false,
+    this.menuEntriesBuilder,
     super.key,
   });
 
   final Track track;
   final List<Widget>? actionButtons;
+  final List<ContextMenuEntry>? menuEntries;
+  final List<ContextMenuEntry> Function()? menuEntriesBuilder;
   final VoidCallback? onPlayPressed;
   final bool isPlaying;
   final bool isSelected;
@@ -39,6 +44,16 @@ class TrackItem extends StatelessWidget {
     ];
 
     return GestureDetector(
+      onSecondaryTapDown: menuEntriesBuilder != null || menuEntries != null
+          ? (e) => showContextMenu(
+              context,
+              contextMenu: .new(
+                entries: menuEntriesBuilder?.call() ?? menuEntries ?? [],
+                borderRadius: Radiuses.r8,
+                position: e.globalPosition,
+              ),
+            )
+          : null,
       child: Card(
         clipBehavior: .hardEdge,
         shape: RoundedRectangleBorder(
