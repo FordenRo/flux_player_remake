@@ -14,6 +14,7 @@ class TrackListView extends StatefulWidget {
     this.showDownload = true,
     this.menuEntriesBuilder,
     this.trackActionButtonsBuilder,
+    this.controller,
     super.key,
   });
 
@@ -30,6 +31,7 @@ class TrackListView extends StatefulWidget {
     List<Widget> children,
   )?
   trackActionButtonsBuilder;
+  final TrackListController? controller;
 
   @override
   State<TrackListView> createState() => _TrackListViewState();
@@ -41,11 +43,13 @@ class _TrackListViewState extends State<TrackListView> {
       ? ListView.builder(
           itemExtent: 50,
           itemCount: widget.tracks.length,
+          controller: widget.controller,
           itemBuilder: _itemBuilder,
         )
       : ReorderableListView.builder(
           itemCount: widget.tracks.length,
           itemExtent: 50,
+          scrollController: widget.controller,
           buildDefaultDragHandles: false,
           onReorderItem: widget.onTrackMoved,
           itemBuilder: (context, idx) => ReorderableDragStartListener(
@@ -89,4 +93,33 @@ class _TrackListViewState extends State<TrackListView> {
           : widget.trackActionButtonsBuilder!(context, index, actionButtons),
     );
   }
+}
+
+class TrackListController extends ScrollController {
+  new({super.onAttach, super.onDetach});
+
+  @override
+  Future<void> animateTo(
+    double offset, {
+    required Duration duration,
+    required Curve curve,
+  }) {
+    final delta = offset - this.offset;
+    if (delta.abs() > 500) jumpTo(offset - 500 * delta.sign);
+    return super.animateTo(offset, duration: duration, curve: curve);
+  }
+
+  Future<void> animateToIndex(int index) => animateTo(
+    _offsetOfIndex(index),
+    duration: Durations.long1,
+    curve: Curves.easeOutQuart,
+  );
+
+  Future<void> animateToTop() =>
+      animateTo(0, duration: Durations.long4, curve: Curves.easeOutQuart);
+
+  void jumpToIndex(int index) => jumpTo(_offsetOfIndex(index));
+
+  double _offsetOfIndex(int index) =>
+      index * 50 - position.viewportDimension / 3;
 }

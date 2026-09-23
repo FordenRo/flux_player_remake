@@ -21,6 +21,10 @@ class AllTracksPage extends StatefulWidget {
 }
 
 class _AllTracksPageState extends State<AllTracksPage> {
+  late final TrackListController controller = .new(
+    onAttach: (position) => Future.microtask(animateToPlaying),
+  );
+
   var query = '';
   _Sorting sorting = .title;
 
@@ -40,6 +44,34 @@ class _AllTracksPageState extends State<AllTracksPage> {
     .date => throw UnimplementedError(),
   };
 
+  Future<void> animateToPlaying() async {
+    if (audioPlayer.currentIndex != null && query.isEmpty) {
+      await controller.animateToIndex(
+        sortedTracks.indexOf(audioPlayer.currentTrack!),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _onQueryChanged(String query) {
+    setState(() => this.query = query);
+    if (query.isEmpty) {
+      animateToPlaying();
+    } else {
+      controller.jumpTo(0);
+    }
+  }
+
+  Future<void> _onSortingChanged(_Sorting sort) async {
+    setState(() => sorting = sort);
+    await animateToPlaying();
+  }
+
   @override
   Widget build(BuildContext context) {
     final tracks = query.isNotEmpty
@@ -53,7 +85,7 @@ class _AllTracksPageState extends State<AllTracksPage> {
             Expanded(
               child: SearchField(
                 hint: 'Поиск треков',
-                onChanged: (query) => setState(() => this.query = query),
+                onChanged: _onQueryChanged,
               ),
             ),
             AnimatedSize(
@@ -85,7 +117,9 @@ class _AllTracksPageState extends State<AllTracksPage> {
                                   .bottomCenter,
                             ),
                           );
-                          setState(() => sorting = sort ?? sorting);
+                          if (sort != null && sort != sorting) {
+                            await _onSortingChanged(sort);
+                          }
                         },
                         label: Text(sortingToText(sorting)),
                         icon: const Icon(Icons.sort_rounded),
@@ -103,6 +137,7 @@ class _AllTracksPageState extends State<AllTracksPage> {
         Expanded(
           child: TrackListView(
             tracks: tracks,
+            controller: controller,
             menuEntriesBuilder: (context, index) => [
               MenuItem(
                 label: const Text('Играть следующим'),
