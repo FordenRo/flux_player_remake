@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
 
@@ -77,6 +78,25 @@ class _AllTracksPageState extends State<AllTracksPage> {
     final tracks = query.isNotEmpty
         ? searchTracks(allTracks, query)
         : sortedTracks;
+
+    if (libraryRepository.getPaths().isEmpty) {
+      return Column(
+        mainAxisAlignment: .center,
+        spacing: 16,
+        children: [
+          const Text('У вас нет путей библиотек!'),
+          TextButton(
+            onPressed: () async {
+              final path = await FilePicker.getDirectoryPath();
+              if (path == null) return;
+
+              setState(() => libraryRepository.addPath(path));
+            },
+            child: const Text('Выбрать путь'),
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
