@@ -48,13 +48,12 @@ class NetworkService {
       }).toList() ??
       [];
 
-  Future<TrackDownloadResult> downloadTrack(Track track) async {
+  Future<TrackDownloadResult?> downloadTrack(Track track) async {
     final data = await client.readBytes(Uri.parse(track.path));
     final filename = '${track.artist} - ${track.title}.mp3';
     final downloadPath =
-        this.downloadPath ??
-        await FilePicker.getDirectoryPath() ??
-        (await getDownloadsDirectory())!.path;
+        this.downloadPath ?? await FilePicker.getDirectoryPath();
+    if (downloadPath == null) return null;
     final file = File('$downloadPath\\$filename')..writeAsBytesSync(data);
     return TrackDownloadResult(
       track: libraryRepository.getTrackFromFile(file),
