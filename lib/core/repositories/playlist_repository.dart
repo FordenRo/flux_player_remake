@@ -22,4 +22,9 @@ class PlaylistRepository with ChangeNotifier {
     notifyListeners();
     return playlist;
   }
+
+  void removePlaylist(Playlist playlist) {
+    _playlists.remove(playlist);
+    notifyListeners();
+  }
 }

@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_context_menu/flutter_context_menu.dart';
 
 import '../../../core/models/playlist.dart';
+import '../../core/repositories/playlist_repository.dart';
 import '../../core/services/audio_player.dart';
 import '../../core/theme/values.dart';
 import 'fade_in_widget.dart';
@@ -40,23 +42,23 @@ class _PlaylistTileState extends State<PlaylistTile> {
     controller.text = playlist.title;
   }
 
-  // Future<void> _showMenu(BuildContext context, TapDownDetails e) =>
-  //     showSimpleMenu(
-  //       context: context,
-  //       offset: e.localPosition.translate(0, -context.size!.height),
-  //       items: [
-  //         SimpleMenuItem(text: 'Переименовать', onTap: focusNode.requestFocus),
-  //         if (configService.mainPlaylist != playlist)
-  //           SimpleMenuItem(
-  //             text: 'Сделать главным',
-  //             onTap: () => configService.mainPlaylist = playlist,
-  //           ),
-  //         SimpleMenuItem(
-  //           text: 'Удалить',
-  //           onTap: () => playlists.remove(playlist),
-  //         ),
-  //       ],
-  //     );
+  Future<void> _showMenu(BuildContext context, TapDownDetails e) =>
+      showContextMenu(
+        context,
+        contextMenu: .new(
+          entries: [
+            MenuItem(
+              label: const Text('Переименовать'),
+              onSelected: (_) => focusNode.requestFocus(),
+            ),
+            MenuItem(
+              label: const Text('Удалить'),
+              onSelected: (_) => playlistRepository.removePlaylist(playlist),
+            ),
+          ],
+          position: e.globalPosition,
+        ),
+      );
 
   Expanded _buildInfo() => Expanded(
     child: Stack(
@@ -157,7 +159,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
     child: GestureDetector(
       onTap: !focusNode.hasFocus ? widget.onTap : null,
       behavior: .opaque,
-      // onSecondaryTapDown: (e) => _showMenu(context, e),
+      onSecondaryTapDown: (e) => _showMenu(context, e),
       child: Padding(
         padding: const .all(10),
         child: Row(spacing: 20, children: [_buildIcon(), _buildInfo()]),
