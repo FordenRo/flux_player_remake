@@ -6,6 +6,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../models/app_config.dart';
 import '../services/audio_player.dart';
+import '../services/network_service.dart';
 import 'library_repository.dart';
 
 final configRepository = ConfigRepository._();
@@ -43,6 +44,9 @@ class ConfigRepository {
     if (config.libraryPaths != null) {
       libraryRepository.setPaths(config.libraryPaths!);
     }
+    if (config.downloadPath != null) {
+      networkService.downloadPath = config.downloadPath;
+    }
     final device = config.device != null
         ? audioPlayer.audioDevices
               .where((e) => e.name == config.device)
@@ -71,6 +75,7 @@ class ConfigRepository {
     final Size(width: ww, height: wh) = await windowManager.getSize();
     final Offset(dx: wx, dy: wy) = await windowManager.getPosition();
     return .new(
+      index: audioPlayer.currentIndex,
       page: page,
       windowPosition: (x: wx.toInt(), y: wy.toInt()),
       windowSize: (x: ww.toInt(), y: wh.toInt()),
@@ -81,6 +86,7 @@ class ConfigRepository {
       looped: audioPlayer.isLooped,
       queue: audioPlayer.queue.map((e) => e.path).toList(),
       position: audioPlayer.position.inSeconds,
+      downloadPath: networkService.downloadPath,
     );
   }
 

@@ -1,16 +1,17 @@
 class AppConfig {
   new({
-    this.page,
-    this.volume,
-    this.position,
-    this.device,
-    this.looped,
-    this.shuffled,
-    this.windowPosition,
-    this.windowSize,
-    this.libraryPaths,
-    this.queue,
-    this.index,
+    required this.page,
+    required this.volume,
+    required this.position,
+    required this.device,
+    required this.looped,
+    required this.shuffled,
+    required this.windowPosition,
+    required this.windowSize,
+    required this.libraryPaths,
+    required this.downloadPath,
+    required this.queue,
+    required this.index,
   });
 
   AppConfig.fromMap(Map<String, dynamic> map)
@@ -21,6 +22,7 @@ class AppConfig {
       looped = map['looped'] as bool?,
       shuffled = map['shuffled'] as bool?,
       libraryPaths = map['libraryPaths'] as List<String>?,
+      downloadPath = map['downloadPath'] as String?,
       queue = map['queue'] as List<String>?,
       index = (map['index'] as num?)?.toInt(),
       windowPosition = map['windowPosition'] as ({int x, int y})?,
@@ -35,6 +37,7 @@ class AppConfig {
   final bool? looped;
   final bool? shuffled;
   final List<String>? libraryPaths;
+  final String? downloadPath;
   final List<String>? queue;
   final int? index;
 
@@ -46,6 +49,7 @@ class AppConfig {
     'looped': looped,
     'shuffled': shuffled,
     'libraryPaths': libraryPaths,
+    'downloadPath': downloadPath,
     'windowPosition': windowPosition,
     'windowSize': windowSize,
     'queue': queue,
