@@ -3,10 +3,12 @@ import 'package:flutter_context_menu/flutter_context_menu.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/models/track.dart';
+import '../../core/repositories/playlist_repository.dart';
 import '../../core/services/audio_player.dart';
 import '../../core/services/network_service.dart';
 import '../../core/theme/styles.dart';
 import '../../core/theme/values.dart';
+import '../../core/utils/global_paint_bounds.dart';
 import 'play_button.dart';
 import 'track_icon.dart';
 
@@ -151,5 +153,47 @@ class TrackDownloadAction extends StatelessWidget {
     onPressed: () => networkService.downloadTrack(
       Provider.of<Track>(context, listen: false),
     ),
+  );
+}
+
+class TrackPlaylistAction extends StatelessWidget {
+  const new({this.iconSize = 18, super.key});
+
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) => TrackActionButton(
+    icon: Icons.playlist_add_rounded,
+    iconSize: iconSize,
+    onPressed: () async {
+      final track = Provider.of<Track>(context, listen: false);
+      final playlists = playlistRepository.getAllPlaylists();
+      await showContextMenu(
+        context,
+        onItemSelected: (value) {
+          if (value == null) return;
+
+          if (value.contains(track)) {
+            value.remove(track);
+          } else {
+            value.add(track);
+          }
+        },
+        contextMenu: .new(
+          position: context.findRenderObject()!.globalPaintBounds.bottomCenter,
+          entries: playlists
+              .where((e) => !e.contains(track))
+              .map((e) => MenuItem(label: Text('+ ${e.title}'), value: e))
+              .followedBy(
+                playlists
+                    .where((e) => e.contains(track))
+                    .map(
+                      (e) => MenuItem(label: Text('- ${e.title}'), value: e),
+                    ),
+              )
+              .toList(),
+        ),
+      );
+    },
   );
 }

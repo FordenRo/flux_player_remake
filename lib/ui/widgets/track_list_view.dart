@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
 
 import '../../core/models/track.dart';
+import '../../core/repositories/playlist_repository.dart';
 import '../../core/services/audio_player.dart';
 import 'track_item.dart';
 
@@ -12,6 +13,7 @@ class TrackListView extends StatefulWidget {
     this.onTrackPlayed,
     this.showNext = true,
     this.showDownload = true,
+    this.showPlaylist = true,
     this.menuEntriesBuilder,
     this.trackActionButtonsBuilder,
     this.controller,
@@ -23,6 +25,7 @@ class TrackListView extends StatefulWidget {
   final void Function(int index)? onTrackPlayed;
   final bool showNext;
   final bool showDownload;
+  final bool showPlaylist;
   final List<ContextMenuEntry<void>> Function(BuildContext context, int index)?
   menuEntriesBuilder;
   final List<Widget> Function(
@@ -73,6 +76,9 @@ class _TrackListViewState extends State<TrackListView> {
   TrackItem _buildTrack(int index) {
     final track = widget.tracks[index];
     final actionButtons = [
+      if (widget.showPlaylist &&
+          playlistRepository.getAllPlaylists().isNotEmpty)
+        const TrackPlaylistAction(),
       if (widget.showDownload && track.isRemote) const TrackDownloadAction(),
       if (widget.showNext) const TrackNextAction(),
     ];
