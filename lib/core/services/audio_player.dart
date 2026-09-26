@@ -69,7 +69,7 @@ class AudioPlayer {
   void setShuffled(bool shuffled, {bool shuffleQueue = true}) {
     if (shuffled && shuffleQueue) {
       final track = currentTrack;
-      _originalQueue ??= List.of(queue);
+      _originalQueue ??= queue.toList();
 
       _queue.shuffle();
       if (track != null) {
@@ -78,7 +78,7 @@ class AudioPlayer {
       }
     } else if (!shuffled) {
       final track = currentTrack;
-      _queue = List.of(currentPlaylist ?? _originalQueue ?? []);
+      _queue = currentPlaylist?.toList() ?? _originalQueue ?? [];
       _originalQueue = null;
       if (track != null) {
         if (_queue.indexOf(track) case final index when index != -1) {
@@ -104,7 +104,7 @@ class AudioPlayer {
   }) async {
     _currentPlaylist = playlist;
     _currentPlaylistController.add(_currentPlaylist);
-    _queue = List.of(playlist);
+    _queue = playlist.toList();
     _queueController.add(_queue);
     if (index != null) {
       await jump(index, play: play);

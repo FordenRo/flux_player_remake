@@ -45,7 +45,6 @@ class _PlayerControlsState extends State<PlayerControls>
   Future<void> showDeviceContextMenu(BuildContext context) async {
     final menu = ContextMenu(
       position: context.findRenderObject()!.globalPaintBounds.center,
-      padding: .zero,
       entries: audioPlayer.audioDevices
           .map(
             (e) => MenuItem(
