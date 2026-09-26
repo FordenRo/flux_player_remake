@@ -8,6 +8,7 @@ import '../models/app_config.dart';
 import '../services/audio_player.dart';
 import '../services/network_service.dart';
 import 'library_repository.dart';
+import 'playlist_repository.dart';
 
 final configRepository = ConfigRepository._();
 
@@ -54,17 +55,23 @@ class ConfigRepository {
         : null;
     if (device != null) await audioPlayer.setAudioDevice(device);
     if (config.volume != null) await audioPlayer.setVolume(config.volume!);
-    if (config.shuffled != null) {
-      audioPlayer.setShuffled(config.shuffled!, shuffleQueue: false);
+    await playlistRepository.loadPlaylists();
+    if (config.playlist != null) {
+      final playlist = playlistRepository
+          .getAllPlaylists()
+          .where((e) => e.title == config.playlist!)
+          .firstOrNull;
+      await audioPlayer.setPlaylist(playlist!);
+    }
+    if (config.queue != null) {
+      final queue = config.queue!
+          .map((e) => libraryRepository.getTrackFromFile(File(e)))
+          .toList();
+      await audioPlayer.setQueue(queue, index: config.index);
     }
     if (config.looped != null) audioPlayer.setLooped(config.looped!);
-    if (config.queue != null) {
-      await audioPlayer.setQueue(
-        config.queue!
-            .map((e) => libraryRepository.getTrackFromFile(File(e)))
-            .toList(),
-        index: config.index,
-      );
+    if (config.shuffled != null) {
+      audioPlayer.setShuffled(config.shuffled!, shuffleQueue: false);
     }
     if (config.position != null) {
       await audioPlayer.seek(Duration(seconds: config.position!));
@@ -87,6 +94,7 @@ class ConfigRepository {
       queue: audioPlayer.queue.map((e) => e.path).toList(),
       position: audioPlayer.position.inSeconds,
       downloadPath: networkService.downloadPath,
+      playlist: audioPlayer.currentPlaylist?.title,
     );
   }
 

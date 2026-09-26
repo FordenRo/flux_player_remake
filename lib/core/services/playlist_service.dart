@@ -14,11 +14,9 @@ class PlaylistService {
     final dir = '${(await getApplicationSupportDirectory()).path}/playlists';
 
     for (final e in playlists) {
-      File('$dir/${e.title}')
+      File('$dir/${e.title}.m3u')
         ..createSync(recursive: true)
-        ..writeAsStringSync(
-          e.map((e) => '${e.title} - ${e.artist}').join('\n'),
-        );
+        ..writeAsStringSync(e.map((e) => e.path).join('\n'));
     }
   }
 
@@ -31,6 +29,7 @@ class PlaylistService {
     return dir
         .listSync()
         .whereType<File>()
+        .where((e) => e.uri.pathSegments.last.endsWith('m3u'))
         .map(
           (e) async => Playlist(
             title: e.uri.pathSegments.last.split('.').first,

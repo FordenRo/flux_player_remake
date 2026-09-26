@@ -12,6 +12,7 @@ class AppConfig {
     required this.downloadPath,
     required this.queue,
     required this.index,
+    required this.playlist,
   });
 
   AppConfig.fromJson(Map<String, dynamic> map)
@@ -25,6 +26,7 @@ class AppConfig {
       downloadPath = map['downloadPath'] as String?,
       queue = (map['queue'] as List<dynamic>?)?.cast<String>(),
       index = (map['index'] as num?)?.toInt(),
+      playlist = map['playlist'] as String?,
       windowPosition = map['windowPosition'] != null
           ? Point.fromJson((map['windowPosition'] as List<dynamic>).cast<int>())
           : null,
@@ -44,6 +46,7 @@ class AppConfig {
   final String? downloadPath;
   final List<String>? queue;
   final int? index;
+  final String? playlist;
 
   Map<String, dynamic> toJson() => {
     'page': page,
@@ -58,6 +61,7 @@ class AppConfig {
     'windowSize': windowSize,
     'queue': queue,
     'index': index,
+    'playlist': playlist,
   };
 }
 

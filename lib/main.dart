@@ -9,9 +9,11 @@ import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
 import 'core/repositories/config_repository.dart';
+import 'core/repositories/playlist_repository.dart';
 import 'core/services/audio_handler.dart';
 import 'core/services/audio_player.dart';
 import 'core/services/config_service.dart';
+import 'core/services/playlist_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +41,7 @@ Future<void> main() async {
 
   await FlutterWindowClose.setWindowShouldCloseHandler(() async {
     await configService.saveAppConfig(await configRepository.getConfig());
+    await playlistService.savePlaylists(playlistRepository.getAllPlaylists());
     return true;
   });
 }
