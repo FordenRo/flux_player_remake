@@ -16,7 +16,10 @@ class PlaylistService {
     for (final e in playlists) {
       File('$dir/${e.title}.m3u')
         ..createSync(recursive: true)
-        ..writeAsStringSync(e.map((e) => e.path).join('\n'));
+        ..writeAsStringSync(
+          '#EXTM3U\n'
+          '${e.map((e) => e.path).join('\n')}',
+        );
     }
   }
 
@@ -34,6 +37,7 @@ class PlaylistService {
           (e) async => Playlist(
             title: e.uri.pathSegments.last.split('.').first,
             tracks: (await e.readAsLines())
+                .where((l) => !l.startsWith('#'))
                 .map((l) => libraryRepository.getTrackFromFile(File(l)))
                 .toList(),
           ),
