@@ -25,6 +25,7 @@ class PlaylistRepository with ChangeNotifier {
 
   void removePlaylist(Playlist playlist) {
     _playlists.remove(playlist);
+    playlistService.deletePlaylist(playlist);
     notifyListeners();
   }
 }

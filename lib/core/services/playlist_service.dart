@@ -23,6 +23,11 @@ class PlaylistService {
     }
   }
 
+  Future<void> deletePlaylist(Playlist playlist) async {
+    final dir = '${(await getApplicationSupportDirectory()).path}/playlists';
+    File('$dir/${playlist.title}.m3u').deleteSync();
+  }
+
   Future<List<Playlist>> loadPlaylists() async {
     final dir = Directory(
       '${(await getApplicationSupportDirectory()).path}/playlists',
