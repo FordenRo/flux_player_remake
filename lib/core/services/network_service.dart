@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 
 import '../models/track.dart';
 import '../repositories/library_repository.dart';

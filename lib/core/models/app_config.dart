@@ -14,25 +14,29 @@ class AppConfig {
     required this.index,
   });
 
-  AppConfig.fromMap(Map<String, dynamic> map)
+  AppConfig.fromJson(Map<String, dynamic> map)
     : page = (map['page'] as num?)?.toInt(),
       volume = (map['volume'] as num?)?.toDouble(),
       position = (map['position'] as num?)?.toInt(),
       device = map['device'] as String?,
       looped = map['looped'] as bool?,
       shuffled = map['shuffled'] as bool?,
-      libraryPaths = map['libraryPaths'] as List<String>?,
+      libraryPaths = (map['libraryPaths'] as List<dynamic>?)?.cast<String>(),
       downloadPath = map['downloadPath'] as String?,
-      queue = map['queue'] as List<String>?,
+      queue = (map['queue'] as List<dynamic>?)?.cast<String>(),
       index = (map['index'] as num?)?.toInt(),
-      windowPosition = map['windowPosition'] as ({int x, int y})?,
-      windowSize = map['windowSize'] as ({int x, int y})?;
+      windowPosition = map['windowPosition'] != null
+          ? Point.fromJson((map['windowPosition'] as List<dynamic>).cast<int>())
+          : null,
+      windowSize = map['windowSize'] != null
+          ? Point.fromJson((map['windowSize'] as List<dynamic>).cast<int>())
+          : null;
 
   final int? page;
   final double? volume;
   final int? position;
-  final ({int x, int y})? windowSize;
-  final ({int x, int y})? windowPosition;
+  final Point? windowSize;
+  final Point? windowPosition;
   final String? device;
   final bool? looped;
   final bool? shuffled;
@@ -41,7 +45,7 @@ class AppConfig {
   final List<String>? queue;
   final int? index;
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
     'page': page,
     'volume': volume,
     'position': position,
@@ -55,4 +59,15 @@ class AppConfig {
     'queue': queue,
     'index': index,
   };
+}
+
+class Point {
+  new(this.x, this.y);
+
+  factory Point.fromJson(List<int> json) => Point(json[0], json[1]);
+
+  final int x;
+  final int y;
+
+  List<int> toJson() => [x, y];
 }

@@ -9,17 +9,17 @@ final configService = ConfigService();
 
 class ConfigService {
   Future<void> saveAppConfig(AppConfig config) async =>
-      File('${(await getApplicationSupportDirectory()).path}/config2')
+      File('${(await getApplicationSupportDirectory()).path}/config')
         ..createSync(recursive: true)
         ..writeAsStringSync(jsonEncode(config));
 
   Future<AppConfig?> loadAppConfig() async {
     final file = File(
-      '${(await getApplicationSupportDirectory()).path}/config2',
+      '${(await getApplicationSupportDirectory()).path}/config',
     );
     if (!file.existsSync()) return null;
 
-    return AppConfig.fromMap(
+    return .fromJson(
       jsonDecode(file.readAsStringSync()) as Map<String, dynamic>,
     );
   }

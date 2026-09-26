@@ -77,8 +77,8 @@ class ConfigRepository {
     return .new(
       index: audioPlayer.currentIndex,
       page: page,
-      windowPosition: (x: wx.toInt(), y: wy.toInt()),
-      windowSize: (x: ww.toInt(), y: wh.toInt()),
+      windowPosition: Point(wx.toInt(), wy.toInt()),
+      windowSize: Point(ww.toInt(), wh.toInt()),
       libraryPaths: libraryRepository.getPaths(),
       device: audioPlayer.audioDevice.name,
       volume: audioPlayer.volume,
