@@ -67,6 +67,8 @@ class AudioPlayer {
       _player.setVolume(max(min(volume, 1), 0) * 100);
 
   void setShuffled(bool shuffled, {bool shuffleQueue = true}) {
+    if (shuffled == isShuffled) return;
+
     if (shuffled && shuffleQueue) {
       final track = currentTrack;
       _originalQueue ??= queue.toList();
@@ -93,6 +95,8 @@ class AudioPlayer {
   }
 
   void setLooped(bool looped) {
+    if (looped == isLooped) return;
+
     _isLooped = looped;
     _isLoopedController.add(looped);
   }
@@ -102,6 +106,8 @@ class AudioPlayer {
     int? index,
     bool play = false,
   }) async {
+    if (playlist == currentPlaylist) return;
+
     _currentPlaylist = playlist;
     _currentPlaylistController.add(_currentPlaylist);
     _queue = playlist.toList();
@@ -188,6 +194,7 @@ class AudioPlayer {
   );
 
   Future<void> setIndex(int index, {bool play = true, bool load = true}) async {
+    if (index == currentIndex) return;
     if (index < 0 || index >= queue.length) index = index % queue.length;
 
     _currentIndex = index;
