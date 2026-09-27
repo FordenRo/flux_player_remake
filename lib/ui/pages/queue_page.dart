@@ -43,7 +43,7 @@ class _QueuePageState extends State<QueuePage>
     return TrackListView(
       tracks: tracks,
       controller: controller,
-      playingIndexCallback: () => audioPlayer.currentIndex!,
+      playingIndexCallback: () => audioPlayer.currentIndex,
       onTrackPlayed: (index) =>
           audioPlayer.setQueue(tracks, index: index, play: true),
       onTrackMoved: (oldIndex, newIndex) {

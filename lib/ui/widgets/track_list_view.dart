@@ -38,7 +38,7 @@ class TrackListView extends StatefulWidget {
     List<Widget> children,
   )?
   trackActionButtonsBuilder;
-  final int Function()? playingIndexCallback;
+  final int? Function()? playingIndexCallback;
   final TrackListController? controller;
 
   @override
@@ -47,9 +47,11 @@ class TrackListView extends StatefulWidget {
 
 class _TrackListViewState extends State<TrackListView> {
   late final TrackListController controller = widget.controller ?? .new();
-  late final int Function() playingIndexCallback =
+  late final int? Function() playingIndexCallback =
       widget.playingIndexCallback ??
-      () => widget.tracks.indexOf(audioPlayer.currentTrack!);
+      () => audioPlayer.currentIndex != null
+          ? widget.tracks.indexOf(audioPlayer.currentTrack!)
+          : null;
 
   @override
   Widget build(BuildContext context) => TrackListFloatingActions(

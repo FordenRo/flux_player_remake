@@ -65,6 +65,7 @@ class ConfigRepository {
     }
     if (config.queue != null) {
       final queue = config.queue!
+          .where((e) => File(e).existsSync())
           .map((e) => libraryRepository.getTrackFromFile(File(e)))
           .toList();
       await audioPlayer.setQueue(queue, index: config.index);

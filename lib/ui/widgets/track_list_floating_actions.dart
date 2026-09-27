@@ -17,7 +17,7 @@ class TrackListFloatingActions extends StatefulWidget {
 
   final Widget child;
   final TrackListController controller;
-  final int Function()? playingIndexCallback;
+  final int? Function()? playingIndexCallback;
   final bool showWatchTrack;
   final bool showGoTop;
 
@@ -80,8 +80,10 @@ class _TrackListFloatingActionsState extends State<TrackListFloatingActions> {
   }
 
   void _onIndexUpdate() {
-    if (watchCurrentTrack && widget.playingIndexCallback != null) {
-      controller.animateToIndex(widget.playingIndexCallback!());
+    if (showWatchTrack &&
+        watchCurrentTrack &&
+        widget.playingIndexCallback != null) {
+      controller.animateToIndex(widget.playingIndexCallback!()!);
     }
   }
 
