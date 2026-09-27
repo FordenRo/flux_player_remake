@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
@@ -40,7 +42,12 @@ class _AllTracksPageState extends State<AllTracksPage> {
   int _sort(Track a, Track b) => switch (sorting) {
     .title => a.title.compareTo(b.title),
     .artist => a.artist.compareTo(b.artist),
-    .date => throw UnimplementedError(),
+    .date =>
+      a.isRemote
+          ? 1
+          : File(b.path)
+                .lastModifiedSync()
+                .compareTo(File(a.path).lastModifiedSync()),
   };
 
   @override
