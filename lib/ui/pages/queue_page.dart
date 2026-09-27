@@ -33,8 +33,8 @@ class _QueuePageState extends State<QueuePage>
 
   @override
   void dispose() {
-    super.dispose();
     subscription.cancel();
+    super.dispose();
   }
 
   Future<void> animateToPlaying() async {

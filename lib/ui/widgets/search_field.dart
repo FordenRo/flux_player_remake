@@ -19,8 +19,8 @@ class _SearchFieldState extends State<SearchField> {
 
   @override
   void dispose() {
-    super.dispose();
     controller.dispose();
+    super.dispose();
   }
 
   @override

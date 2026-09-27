@@ -37,9 +37,9 @@ class _VolumeButtonState extends State<VolumeButton>
 
   @override
   void dispose() {
-    super.dispose();
     subscription.cancel();
     animTimer?.cancel();
+    super.dispose();
   }
 
   void mute() {

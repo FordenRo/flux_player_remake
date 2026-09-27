@@ -44,8 +44,8 @@ class _AppHomeState extends State<AppHome> {
 
   @override
   void dispose() {
-    super.dispose();
     subscription.cancel();
+    super.dispose();
   }
 
   @override

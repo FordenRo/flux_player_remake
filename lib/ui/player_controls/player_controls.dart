@@ -37,9 +37,9 @@ class _PlayerControlsState extends State<PlayerControls>
 
   @override
   void dispose() {
-    super.dispose();
     playAnim.dispose();
     subscription.cancel();
+    super.dispose();
   }
 
   Future<void> showDeviceContextMenu(BuildContext context) async {
