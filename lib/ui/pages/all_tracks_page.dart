@@ -22,9 +22,7 @@ class AllTracksPage extends StatefulWidget {
 }
 
 class _AllTracksPageState extends State<AllTracksPage> {
-  late final TrackListController controller = .new(
-    onAttach: (position) => Future.microtask(animateToPlaying),
-  );
+  late final TrackListController controller = .new();
 
   var query = '';
   _Sorting sorting = .title;
@@ -45,14 +43,6 @@ class _AllTracksPageState extends State<AllTracksPage> {
     .date => throw UnimplementedError(),
   };
 
-  Future<void> animateToPlaying() async {
-    if (audioPlayer.currentIndex != null && query.isEmpty) {
-      await controller.animateToIndex(
-        sortedTracks.indexOf(audioPlayer.currentTrack!),
-      );
-    }
-  }
-
   @override
   void dispose() {
     controller.dispose();
@@ -61,17 +51,13 @@ class _AllTracksPageState extends State<AllTracksPage> {
 
   void _onQueryChanged(String query) {
     setState(() => this.query = query);
-    if (query.isEmpty) {
-      animateToPlaying();
-    } else {
+    if (query.isNotEmpty) {
       controller.jumpTo(0);
     }
   }
 
-  Future<void> _onSortingChanged(_Sorting sort) async {
-    setState(() => sorting = sort);
-    await animateToPlaying();
-  }
+  Future<void> _onSortingChanged(_Sorting sort) async =>
+      setState(() => sorting = sort);
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +144,7 @@ class _AllTracksPageState extends State<AllTracksPage> {
           child: TrackListView(
             tracks: tracks,
             controller: controller,
+            showWatchTrack: query.isEmpty,
             menuEntriesBuilder: (context, index) => [
               MenuItem(
                 label: const Text('Играть следующим'),

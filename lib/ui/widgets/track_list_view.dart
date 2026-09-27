@@ -5,6 +5,7 @@ import '../../core/models/track.dart';
 import '../../core/repositories/playlist_repository.dart';
 import '../../core/services/audio_player.dart';
 import 'track_item.dart';
+import 'track_list_floating_actions.dart';
 
 class TrackListView extends StatefulWidget {
   const new({
@@ -17,6 +18,8 @@ class TrackListView extends StatefulWidget {
     this.menuEntriesBuilder,
     this.trackActionButtonsBuilder,
     this.controller,
+    this.playingIndexCallback,
+    this.showWatchTrack = true,
     super.key,
   });
 
@@ -26,6 +29,7 @@ class TrackListView extends StatefulWidget {
   final bool showNext;
   final bool showDownload;
   final bool showPlaylist;
+  final bool showWatchTrack;
   final List<ContextMenuEntry<void>> Function(BuildContext context, int index)?
   menuEntriesBuilder;
   final List<Widget> Function(
@@ -34,6 +38,7 @@ class TrackListView extends StatefulWidget {
     List<Widget> children,
   )?
   trackActionButtonsBuilder;
+  final int Function()? playingIndexCallback;
   final TrackListController? controller;
 
   @override
@@ -41,31 +46,41 @@ class TrackListView extends StatefulWidget {
 }
 
 class _TrackListViewState extends State<TrackListView> {
+  late final TrackListController controller = widget.controller ?? .new();
+  late final int Function() playingIndexCallback =
+      widget.playingIndexCallback ??
+      () => widget.tracks.indexOf(audioPlayer.currentTrack!);
+
   @override
-  Widget build(BuildContext context) => widget.onTrackMoved == null
-      ? ListView.builder(
-          itemExtent: 50,
-          itemCount: widget.tracks.length,
-          controller: widget.controller,
-          itemBuilder: _itemBuilder,
-        )
-      : ReorderableListView.builder(
-          itemCount: widget.tracks.length,
-          itemExtent: 50,
-          scrollController: widget.controller,
-          buildDefaultDragHandles: false,
-          onReorderItem: widget.onTrackMoved,
-          itemBuilder: (context, idx) => ReorderableDragStartListener(
-            key: Key(idx.toString()),
-            index: idx,
-            child: _itemBuilder(context, idx),
+  Widget build(BuildContext context) => TrackListFloatingActions(
+    playingIndexCallback: playingIndexCallback,
+    controller: controller,
+    showWatchTrack: widget.showWatchTrack,
+    child: widget.onTrackMoved == null
+        ? ListView.builder(
+            itemExtent: 50,
+            itemCount: widget.tracks.length,
+            controller: controller,
+            itemBuilder: _itemBuilder,
+          )
+        : ReorderableListView.builder(
+            itemCount: widget.tracks.length,
+            itemExtent: 50,
+            scrollController: controller,
+            buildDefaultDragHandles: false,
+            onReorderItem: widget.onTrackMoved,
+            itemBuilder: (context, idx) => ReorderableDragStartListener(
+              key: Key(idx.toString()),
+              index: idx,
+              child: _itemBuilder(context, idx),
+            ),
           ),
-        );
+  );
 
   Widget _itemBuilder(BuildContext context, int index) => StreamBuilder(
     stream: audioPlayer.stream.currentTrack,
     builder: (context, asyncSnapshot) =>
-        audioPlayer.currentTrack == widget.tracks[index]
+        playingIndexCallback() == audioPlayer.currentIndex
         ? StreamBuilder(
             stream: audioPlayer.stream.isPlaying,
             builder: (context, asyncSnapshot) => _buildTrack(index),
@@ -84,10 +99,10 @@ class _TrackListViewState extends State<TrackListView> {
     ];
     return TrackItem(
       track,
-      isSelected: audioPlayer.currentTrack == track,
-      isPlaying: audioPlayer.currentTrack == track && audioPlayer.isPlaying,
+      isSelected: playingIndexCallback() == index,
+      isPlaying: playingIndexCallback() == index && audioPlayer.isPlaying,
       onPlayPressed: widget.onTrackPlayed != null
-          ? () => audioPlayer.currentTrack == track && audioPlayer.isPlaying
+          ? () => playingIndexCallback() == index && audioPlayer.isPlaying
                 ? audioPlayer.pause()
                 : widget.onTrackPlayed!(index)
           : null,

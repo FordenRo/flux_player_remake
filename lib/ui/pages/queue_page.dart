@@ -18,9 +18,7 @@ class QueuePage extends StatefulWidget {
 class _QueuePageState extends State<QueuePage>
     with AutomaticKeepAliveClientMixin<QueuePage> {
   late final StreamSubscription subscription;
-  late final TrackListController controller = .new(
-    onAttach: (position) => Future.microtask(animateToPlaying),
-  );
+  late final TrackListController controller = .new();
 
   @override
   bool get wantKeepAlive => true;
@@ -37,12 +35,6 @@ class _QueuePageState extends State<QueuePage>
     super.dispose();
   }
 
-  Future<void> animateToPlaying() async {
-    if (audioPlayer.currentIndex != null) {
-      await controller.animateToIndex(audioPlayer.currentIndex!);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -51,6 +43,7 @@ class _QueuePageState extends State<QueuePage>
     return TrackListView(
       tracks: tracks,
       controller: controller,
+      playingIndexCallback: () => audioPlayer.currentIndex!,
       onTrackPlayed: (index) =>
           audioPlayer.setQueue(tracks, index: index, play: true),
       onTrackMoved: (oldIndex, newIndex) {
