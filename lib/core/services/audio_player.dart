@@ -66,10 +66,10 @@ class AudioPlayer {
   Future<void> setVolume(double volume) =>
       _player.setVolume(max(min(volume, 1), 0) * 100);
 
-  void setShuffled(bool shuffled, {bool shuffleQueue = true}) {
+  void setShuffled(bool shuffled) {
     if (shuffled == isShuffled) return;
 
-    if (shuffled && shuffleQueue) {
+    if (shuffled) {
       final track = currentTrack;
       _originalQueue ??= queue.toList();
 
@@ -78,7 +78,7 @@ class AudioPlayer {
         _currentIndex = _queue.indexOf(track);
         _currentIndexController.add(_currentIndex);
       }
-    } else if (!shuffled) {
+    } else {
       final track = currentTrack;
       _queue = currentPlaylist?.toList() ?? _originalQueue ?? [];
       _originalQueue = null;

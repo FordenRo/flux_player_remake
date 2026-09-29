@@ -72,7 +72,7 @@ class ConfigRepository {
     }
     if (config.looped != null) audioPlayer.setLooped(config.looped!);
     if (config.shuffled != null) {
-      audioPlayer.setShuffled(config.shuffled!, shuffleQueue: false);
+      audioPlayer.setShuffled(config.shuffled!);
     }
     if (config.position != null) {
       await audioPlayer.seek(Duration(seconds: config.position!));
