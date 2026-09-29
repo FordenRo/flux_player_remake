@@ -12,6 +12,7 @@ import '../../core/services/audio_player.dart';
 import '../../core/utils/global_paint_bounds.dart';
 import '../../core/utils/track_search.dart';
 import '../widgets/search_field.dart';
+import '../widgets/track_details.dart';
 import '../widgets/track_list_view.dart';
 
 enum _Sorting { title, artist, date }
@@ -152,41 +153,51 @@ class _AllTracksPageState extends State<AllTracksPage> {
             tracks: tracks,
             controller: controller,
             showWatchTrack: query.isEmpty,
-            menuEntriesBuilder: (context, index) => [
-              MenuItem(
-                label: const Text('Играть следующим'),
-                onSelected: (_) => audioPlayer.addNext(tracks[index]),
-              ),
-              if (playlists.isNotEmpty &&
-                  playlists.any((e) => !e.contains(tracks[index])))
-                MenuItem.submenu(
-                  label: const Text('Добавить в плейлист'),
-                  items: playlists
-                      .where((e) => !e.contains(tracks[index]))
-                      .map(
-                        (e) => MenuItem<void>(
-                          label: Text(e.title),
-                          onSelected: (_) => e.add(tracks[index]),
-                        ),
-                      )
-                      .toList(),
+            menuEntriesBuilder: (context, index) {
+              final track = tracks[index];
+              return [
+                MenuItem(
+                  label: const Text('Играть следующим'),
+                  onSelected: (_) => audioPlayer.addNext(track),
                 ),
-              if (playlists.isNotEmpty &&
-                  playlists.any((e) => e.contains(tracks[index])))
-                MenuItem.submenu(
-                  label: const Text('Удалить из плейлиста'),
-                  items: playlists
-                      .where((e) => e.contains(tracks[index]))
-                      .map(
-                        (e) => MenuItem<void>(
-                          label: Text(e.title),
-                          onSelected: (_) => e.remove(tracks[index]),
-                        ),
-                      )
-                      .toList(),
+                if (playlists.isNotEmpty &&
+                    playlists.any((e) => !e.contains(track)))
+                  MenuItem.submenu(
+                    label: const Text('Добавить в плейлист'),
+                    items: playlists
+                        .where((e) => !e.contains(track))
+                        .map(
+                          (e) => MenuItem<void>(
+                            label: Text(e.title),
+                            onSelected: (_) => e.add(track),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                if (playlists.isNotEmpty &&
+                    playlists.any((e) => e.contains(track)))
+                  MenuItem.submenu(
+                    label: const Text('Удалить из плейлиста'),
+                    items: playlists
+                        .where((e) => e.contains(track))
+                        .map(
+                          (e) => MenuItem<void>(
+                            label: Text(e.title),
+                            onSelected: (_) => e.remove(track),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                const MenuItem(label: Text('Удалить')), // TODO
+                MenuItem(
+                  label: const Text('Свойства'),
+                  onSelected: (_) => showDialog(
+                    context: context,
+                    builder: (context) => TrackDetails(track),
+                  ),
                 ),
-              const MenuItem(label: Text('Удалить')), // TODO
-            ],
+              ];
+            },
             onTrackPlayed: (index) =>
                 audioPlayer.setQueue(tracks.toList(), index: index, play: true),
           ),
